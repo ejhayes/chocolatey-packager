@@ -2,7 +2,7 @@ function Get-JenkinsChanges {
 param(
   [string]$buildUrl=""
 )
-    $DebugPreference = 'continue'
+    $DebugPreference = $env:Debug;
     $ErrorActionPreference = "Stop"
     
     # parse from the url
