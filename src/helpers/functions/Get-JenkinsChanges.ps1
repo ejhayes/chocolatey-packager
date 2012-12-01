@@ -10,7 +10,7 @@ param(
         $message = "NO CHANGES"
     } else {
         $xml = [xml](New-Object System.Net.WebClient).DownloadString("$($buildUrl)api/xml")
-        $message = $xml.selectnodes("//changeSet/item") | % { "$($_.msg) [$($_.user)]" }
+        $message = $xml.selectnodes("//changeSet/item") | % { "$($_.msg) [$($_.user)$($_.author.fullName)]" }
         
         if( $message -eq "" ) {
             $message = "NO CHANGES"
