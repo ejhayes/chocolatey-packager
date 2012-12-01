@@ -4,29 +4,29 @@ param(
 )
     $DebugPreference = $env:Debug;
     $ErrorActionPreference = "Stop"
-    
-    Write-Debug $buildUrl
-    
+    $noChanges = "NO CHANGES.."
+
     # parse from the url
     if( $buildUrl -eq "" ) {
-        $message = "NO CHANGES"
+        $message = $noChanges
     } else {
-        $message = "$buildUrl`n"
         $xml = [xml](New-Object System.Net.WebClient).DownloadString("$($buildUrl)api/xml")
         
         $upstreamUrl = $xml.selectnodes("//cause") | % { "$($_.upstreamUrl)$($_.upstreamBuild)" }
-        Write-Debug $upstreamUrl
         
         if( $upstreamUrl -ne "" ) {
-            $message += Get-JenkinsChanges "$($env:JENKINS_URL)$upstreamUrl"
+            $upstreamUrl = "$($env:JENKINS_URL)$upstreamUrl/"
+            $message += Get-JenkinsChanges $upstreamUrl
+        } 
+
+        $message += "$buildUrl`n"
+        $changes = $xml.selectnodes("//changeSet/item") | % { "$($_.msg) [$($_.user)$($_.author.fullName)]" }
+
+        if( $changes -eq "" -or $changes -eq $null ) {
+            $message += "$noChanges`n`n"
         } else {
-            $message += $xml.selectnodes("//changeSet/item") | % { "$($_.msg) [$($_.user)$($_.author.fullName)]" }
-        }
-        
-        if( $message -eq "" ) {
-            $message = "NO CHANGES"
+            $message += "$changes`n`n"
         }
     }
-    Write-Debug $message
     return $message
 }
