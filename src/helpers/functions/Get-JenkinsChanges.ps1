@@ -10,7 +10,11 @@ param(
         $message = "NO CHANGES"
     } else {
         $xml = [xml](New-Object System.Net.WebClient).DownloadString("$($buildUrl)api/xml")
-        $message = $xml.freeStyleBuild.changeSet.Item | %{ "$($_.msg) - $($_.user)" }
+        $message = $xml.selectnodes("//changeSet/item") | % { "$($_.msg) [$($_.user)]" }
+        
+        if( $message -eq "" ) {
+            $message = "NO CHANGES"
+        }
     }
     
     return $message
