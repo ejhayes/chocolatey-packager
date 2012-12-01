@@ -5,6 +5,8 @@ param(
     $DebugPreference = $env:Debug;
     $ErrorActionPreference = "Stop"
     
+    Write-Debug $buildUrl
+    
     # parse from the url
     if( $buildUrl -eq "" ) {
         $message = "NO CHANGES"
@@ -13,6 +15,7 @@ param(
         $xml = [xml](New-Object System.Net.WebClient).DownloadString("$($buildUrl)api/xml")
         
         $upstreamUrl = $xml.selectnodes("//cause") | % { "$($_.upstreamUrl)$($_.upstreamBuild)" }
+        Write-Debug $upstreamUrl
         
         if( $upstreamUrl -ne "" ) {
             $message += Get-JenkinsChanges "$($env:JENKINS_URL)$upstreamUrl"
@@ -24,6 +27,6 @@ param(
             $message = "NO CHANGES"
         }
     }
-    
+    Write-Debug $message
     return $message
 }
