@@ -20,13 +20,14 @@ param(
         } 
 
         $message += "$buildUrl`n-------------------------------------------`n"
-        $changes = $xml.selectnodes("//changeSet/item") | % { 
+        $changes = ""
+        $xml.selectnodes("//changeSet/item") | % { 
             if( $_.user -eq "" -or $_.user -eq $null ) {
                 $usr = $_.author.fullName
             } else {
                 $usr = $_.user
             }
-            "$($_.msg.Trim()) [$usr]`n1"
+            $changes += "$($_.msg.Trim()) [$usr]`n"
         }
 
         if( $changes -eq "" -or $changes -eq $null ) {
