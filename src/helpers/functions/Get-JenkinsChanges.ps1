@@ -19,8 +19,15 @@ param(
             $message += Get-JenkinsChanges $upstreamUrl
         } 
 
-        $message += "$buildUrl`n"
-        $changes = $xml.selectnodes("//changeSet/item") | % { "$($_.msg) [$($_.user)$($_.author.fullName)]" }
+        $message += "$buildUrl`n-------------------------------------------`n"
+        $changes = $xml.selectnodes("//changeSet/item") | % { 
+            if( $_.user -eq "" -or $_.user -eq $null ) {
+                $usr = $_.author.fullName
+            } else {
+                $usr = $_.user
+            }
+            "$($_.msg.Trim()) [$usr]`n1"
+        }
 
         if( $changes -eq "" -or $changes -eq $null ) {
             $message += "$noChanges`n`n"
